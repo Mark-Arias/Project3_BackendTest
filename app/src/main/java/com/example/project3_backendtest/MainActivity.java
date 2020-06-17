@@ -50,8 +50,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     // format of appending string /<make>/<model>/<zipcode>
     // zipcode = 92603 (hardcoded zip)
     //TODO: the url in part c is sending data as a json object and not an array!
+    // 3/23 are teslas
     StringBuilder availableVehicleURLSting = new StringBuilder("https://thawing-beach-68207.herokuapp.com/cars/10/20/92603");
     private static String availableVehicleURL = "https://thawing-beach-68207.herokuapp.com/cars/";
+    private static String zipCode = "92603";
 
     //----------------------------------------------------------------------------------------------
     // local storage
@@ -71,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //contactList = new ArrayList<>();    // init arraylist
         carMakesList = new ArrayList<>();   // init arraylist
         carModelsList = new ArrayList<>();
+        vehiclesList = new ArrayList<>();
 
         lv = (ListView) findViewById(R.id.list);    // init list view var to UI listview
 
@@ -85,7 +88,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         new GetMake().execute();    // create a new thread to acquire contacts as JSON from a remote server
         //new GetModel().execute();
-        new GetAvailableVehicles().execute();
+        //new GetAvailableVehicles().execute();
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItem = (String) parent.getItemAtPosition(position).toString();   // this item is the hashmap with the values i need
+                // to create a new fragment populated with all the right info
+                // so fragment creation should happen here
+               System.out.println("User selected: " + selectedItem);
+
+            }
+        });
+
     }
 
 
@@ -103,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // Showing selected spinner item
         //Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
 
+        // case items below checking for user selection of a car make
         String item = parent.getItemAtPosition(position).toString();    // get string of selected car make( vehicle brand)
         switch(item) {      // find which make was selected to display the related models in that car brand
             case "Jaguar":  // id 2
@@ -115,6 +131,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 carModelsURLString.replace(0,carModelsURLString.length(),carModelsURL);
                 carModelsURLString.append("3");
                 new GetModel().execute();
+                //lv.clearChoices();
+                //new GetAvailableVehicles().execute();
                 break;
 
             case "Lamborghini":
@@ -138,8 +156,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             case "Bugatti":
                 carModelsURLString.replace(0,carModelsURLString.length(),carModelsURL);
                 carModelsURLString.append("7");
-                System.out.println("Test");
-                System.out.println(carModelsURLString.toString());
+                //System.out.println("Test");
+                //System.out.println(carModelsURLString.toString());
                 new GetModel().execute();
                 break;
 
@@ -170,6 +188,68 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             default:
                 //System.out.println("Invalid input");
 
+        }
+
+        // cases below checking for user selction of a specific model in the modelSpinner
+
+        // TODO: an ideal todo would be to try and refactor this code, and do less hardcoding and retrieve the make and model id info from the relavant hashmap objects
+        // will need to play around a bit to tinker with that and get that up and running
+        // Tesla Cases, make id = 3
+        switch (item) {
+            case "Model X": // model id = 23
+                Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+                availableVehicleURLSting.replace(0,availableVehicleURLSting.length(),availableVehicleURL);
+                //lv.clearChoices();
+                vehiclesList.clear();   // clear out old vehicle list data
+                availableVehicleURLSting.append("3/23/");
+                availableVehicleURLSting.append(zipCode);
+                new GetAvailableVehicles().execute();
+                break;
+            case "Model S": //model id = 3
+                Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+                availableVehicleURLSting.replace(0,availableVehicleURLSting.length(),availableVehicleURL);
+                //lv.clearChoices();
+                vehiclesList.clear();   // clear out old vehicle list data
+                availableVehicleURLSting.append("3/3/");
+                availableVehicleURLSting.append(zipCode);
+                new GetAvailableVehicles().execute();
+                break;
+            default:
+        }
+
+
+        // Lamborghini Cases, make id = 4
+        switch (item) {
+            case "Aventador": // model id = 8
+                Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+                availableVehicleURLSting.replace(0,availableVehicleURLSting.length(),availableVehicleURL);
+                //lv.clearChoices();
+
+                vehiclesList.clear();   // clear out old vehicle list data
+                availableVehicleURLSting.append("4/8/");
+                availableVehicleURLSting.append(zipCode);
+                new GetAvailableVehicles().execute();
+                //System.out.println(vehiclesList.get(0).get("4"));
+                break;
+            case "Huracan": //model id = 6
+                Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+                availableVehicleURLSting.replace(0,availableVehicleURLSting.length(),availableVehicleURL);
+                //lv.clearChoices();
+                vehiclesList.clear();   // clear out old vehicle list data
+                availableVehicleURLSting.append("4/6/");
+                availableVehicleURLSting.append(zipCode);
+                new GetAvailableVehicles().execute();
+                break;
+            case "Urus": //model id = 7
+                Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+                availableVehicleURLSting.replace(0,availableVehicleURLSting.length(),availableVehicleURL);
+                //lv.clearChoices();
+                vehiclesList.clear();   // clear out old vehicle list data
+                availableVehicleURLSting.append("4/7/");
+                availableVehicleURLSting.append(zipCode);
+                new GetAvailableVehicles().execute();
+                break;
+            default:
         }
 
 
@@ -236,6 +316,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 try {
                     JSONObject jsonObj = new JSONObject(jsonStr);
                     JSONArray lists = jsonObj.getJSONArray("lists");    // convert json object to json array with specified name
+
+                    //vehiclesList.clear();   // clear out the hashmap for each new run of this code,
+
+                    // otherwise the list view gets cluttered with old calls info
 
 
                     // looping through All list of vehicles
@@ -323,9 +407,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
              * */
 
 
-            ListAdapter adapter = new SimpleAdapter(getApplicationContext(),vehiclesList,R.layout.list_item, new String []{"model", "price", "mileage"},
+            //lv.clearChoices();
+
+            ListAdapter adapter = new SimpleAdapter(getApplicationContext(),vehiclesList,R.layout.list_item, new String []{"model", "price", "vin_number"},
                     new int[]{R.id.name,R.id.email,R.id.mobile});
             lv.setAdapter(adapter);
+            //vehiclesList.clear();
 
             //ArrayAdapter<String> spinnerArrayAdapter2 = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, modelArray); //selected item will look like a spinner set from XML
             //spinnerArrayAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
