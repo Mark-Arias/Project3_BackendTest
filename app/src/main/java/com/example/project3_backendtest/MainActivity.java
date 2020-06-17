@@ -27,6 +27,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
+    //----------------------------------------------------------------------------------------------
+    // UI components for the main activity
     private String TAG = MainActivity.class.getSimpleName();    // get simple name of the class in the source code
 
     private ProgressDialog pDialog;
@@ -34,21 +36,33 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Spinner spinner;
     private Spinner modelSpinner;
 
-
-    // URL to get JSON
-    private static String carMakes = "https://thawing-beach-68207.herokuapp.com/carmakes";
+    //----------------------------------------------------------------------------------------------
+    // URL's for connection to specified remote servers
+    //
+    private static String carMakes = "https://thawing-beach-68207.herokuapp.com/carmakes";  // link to car makes(car brand)
     private static String url = carMakes;
-    //TODO: the url in part c is sending data as a json object and not an array!
 
-    StringBuilder carModelsURLString = new StringBuilder("https://thawing-beach-68207.herokuapp.com/carmodelmakes/");
+    // proper model makes are retrieved by appending the id of that car model to the end of this url
+    StringBuilder carModelsURLString = new StringBuilder("https://thawing-beach-68207.herokuapp.com/carmodelmakes/");   // using String builder to exploit mutability
     private static String carModelsURL = "https://thawing-beach-68207.herokuapp.com/carmodelmakes/";   // invalid link without makeID appended to the end
 
+    // link to retreivable vehicles
+    // format of appending string /<make>/<model>/<zipcode>
+    // zipcode = 92603 (hardcoded zip)
+    //TODO: the url in part c is sending data as a json object and not an array!
+    StringBuilder availableVehicleURLSting = new StringBuilder("https://thawing-beach-68207.herokuapp.com/cars/10/20/92603");
+    private static String availableVehicleURL = "https://thawing-beach-68207.herokuapp.com/cars/";
+
+    //----------------------------------------------------------------------------------------------
+    // local storage
     //ArrayList<HashMap<String, String>> contactList;
     private ArrayList<HashMap<String, String>> carMakesList;
     private ArrayList<String>  makeArray;
     private ArrayList<HashMap<String,String>> carModelsList;
     private ArrayList<String> modelArray;
+    private ArrayList<HashMap<String,String>> vehiclesList;
 
+    //----------------------------------------------------------------------------------------------
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,13 +83,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         makeArray = new ArrayList<>();
         modelArray = new ArrayList<>();
 
-
-
         new GetMake().execute();    // create a new thread to acquire contacts as JSON from a remote server
         //new GetModel().execute();
-
-
+        new GetAvailableVehicles().execute();
     }
+
+
 
     //----------------------------------------------------------------------------------------------
     // methods implemented to add item selection abilities to the spinners
@@ -188,7 +201,139 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     //----------------------------------------------------------------------------------------------
 
+    /**
+     * Class performs an asyncrhonous remote server request for json data about
+     * the available cars for a specified car brand(make) and car model
+     */
+    private class GetAvailableVehicles extends AsyncTask<Void,Void,Void> {
+        /**
+         * actions to execute before invoking background thread
+         */
+        /*
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(MainActivity.this);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
 
+        }
+
+         */
+
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+
+            HttpHandler sh = new HttpHandler();     // create new httphandler instance
+            // Making a request to url and getting response
+            String jsonStr = sh.makeServiceCall(availableVehicleURLSting.toString());
+            Log.e(TAG, "Response from url: " + jsonStr);    // log the response from url to the terminal
+
+            if (jsonStr != null) {  // if not null, then connection made, and data was passed from service call to the url
+                try {
+                    JSONObject jsonObj = new JSONObject(jsonStr);
+                    JSONArray lists = jsonObj.getJSONArray("lists");    // convert json object to json array with specified name
+
+
+                    // looping through All list of vehicles
+                    for (int i = 0; i < lists.length(); i++) {
+                        JSONObject c = lists.getJSONObject(i);   // create a temp json object c, and set it the ith json object in lists
+
+                        // extract local fields from the json object
+                        String color = c.getString("color");
+                        String created_at = c.getString("created_at");
+                        String id = c.getString("id");
+                        String image_url = c.getString("image_url");
+                        String mileage = c.getString("mileage");
+                        String model = c.getString("model");
+                        String price = c.getString("price");
+                        String veh_description = c.getString("veh_description");
+                        String vehicle_make = c.getString("vehicle_make");
+                        String vehicle_url = c.getString("vehicle_url");
+                        String vin_number = c.getString("vin_number");
+                        //System.out.println(id);
+                        //System.out.println(model);
+                        //System.out.println(vehicle_make_id);
+
+                        // tmp hashmap for storing a single available vehicles list
+                        HashMap<String,String>  availableVehiclesList = new HashMap<>();
+
+                        // add each child node to HashMap key => value
+                        availableVehiclesList.put("color",color);
+                        availableVehiclesList.put("created_at",created_at);
+                        availableVehiclesList.put("id",id);
+                        availableVehiclesList.put("image_url",image_url);
+                        availableVehiclesList.put("mileage",mileage);
+
+                        availableVehiclesList.put("model",model);
+                        availableVehiclesList.put("price",price);
+                        availableVehiclesList.put("veh_description",veh_description);
+                        availableVehiclesList.put("vehicle_make",vehicle_make);
+                        availableVehiclesList.put("vehicle_url",vehicle_url);
+                        availableVehiclesList.put("vin_number",vin_number);
+
+                        vehiclesList.add(availableVehiclesList);
+
+                        // create a individual array later if needed to get simple access to some subfield info
+                        //modelArray.add(model);    // create an arraylist of only the models
+
+                    }
+
+
+                } catch (final JSONException e) {
+                    Log.e(TAG, "Json parsing error: " + e.getMessage());    // invalid json received from url
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() { // execute code snippet inside the main thread
+                            Toast.makeText(getApplicationContext(), "Json parsing error: " + e.getMessage(), Toast.LENGTH_LONG).show(); // create notific. toast
+                        }
+                    });
+
+                }
+            } else {
+                Log.e(TAG, "Couldn't get json from server.");   // connection was not sucesfully established
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "Couldn't get json from server. Check LogCat for possible errors!", Toast.LENGTH_LONG).show();
+                    }
+                });
+
+            }
+
+            return null;
+        }
+
+
+        /**
+         * Actions to perform after background thread has finished
+         */
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            /**
+             * Updating parsed JSON data into ListView
+             * */
+
+
+            ListAdapter adapter = new SimpleAdapter(getApplicationContext(),vehiclesList,R.layout.list_item, new String []{"model", "price", "mileage"},
+                    new int[]{R.id.name,R.id.email,R.id.mobile});
+            lv.setAdapter(adapter);
+
+            //ArrayAdapter<String> spinnerArrayAdapter2 = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, modelArray); //selected item will look like a spinner set from XML
+            //spinnerArrayAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            //modelSpinner.setAdapter(spinnerArrayAdapter2);
+
+        }
+
+    }
 
 
 
@@ -413,8 +558,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             /**
              * Updating parsed JSON data into ListView
              * */
-            ListAdapter adapter = new SimpleAdapter(MainActivity.this, carMakesList, R.layout.list_item, new String[]{"id", "vehicle_make"},
-                    new int[]{R.id.name, R.id.email});
+            //ListAdapter adapter = new SimpleAdapter(MainActivity.this, carMakesList, R.layout.list_item, new String[]{"id", "vehicle_make"},
+            //        new int[]{R.id.name, R.id.email});
 
             //ListAdapter adapter2 = new SimpleAdapter(MainActivity.this,carMakesList,R.layout.support_simple_spinner_dropdown_item,
              //       new String [] {"vehicle_make"}, new int[] {R.id.make_spinner});
@@ -433,7 +578,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             // Apply the adapter to the spinner
             //spinner.setAdapter(adapter2);
 
-            lv.setAdapter(adapter);
+            //lv.setAdapter(adapter);
         }
 
     }
