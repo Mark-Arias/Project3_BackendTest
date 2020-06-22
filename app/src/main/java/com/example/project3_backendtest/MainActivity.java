@@ -238,7 +238,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         }
 
+
+
         // cases below checking for user selction of a specific model in the modelSpinner
+
+
 
         // TODO: an ideal todo would be to try and refactor this code, and do less hardcoding and retrieve the make and model id info from the relavant hashmap objects
         // will need to play around a bit to tinker with that and get that up and running
@@ -269,37 +273,91 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // Lamborghini Cases, make id = 4
         switch (item) {
             case "Aventador": // model id = 8
-                Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
-                availableVehicleURLSting.replace(0,availableVehicleURLSting.length(),availableVehicleURL);
-                //lv.clearChoices();
-
-                vehiclesList.clear();   // clear out old vehicle list data
-                availableVehicleURLSting.append("4/8/");
-                availableVehicleURLSting.append(zipCode);
-                new GetAvailableVehicles().execute();
-                //System.out.println(vehiclesList.get(0).get("4"));
+                populateList("4/8/");
                 break;
             case "Huracan": //model id = 6
-                Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
-                availableVehicleURLSting.replace(0,availableVehicleURLSting.length(),availableVehicleURL);
-                //lv.clearChoices();
-                vehiclesList.clear();   // clear out old vehicle list data
-                availableVehicleURLSting.append("4/6/");
-                availableVehicleURLSting.append(zipCode);
-                new GetAvailableVehicles().execute();
+                populateList("4/6/");
                 break;
             case "Urus": //model id = 7
-                Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
-                availableVehicleURLSting.replace(0,availableVehicleURLSting.length(),availableVehicleURL);
-                //lv.clearChoices();
-                vehiclesList.clear();   // clear out old vehicle list data
-                availableVehicleURLSting.append("4/7/");
-                availableVehicleURLSting.append(zipCode);
-                new GetAvailableVehicles().execute();
+                populateList("4/7/");
                 break;
             default:
         }
 
+
+        // Aston Martin Cases, make id = 10
+        switch (item) {
+            case "DB11": // model id = 21
+                populateList("10/21/");
+                break;
+            case "V12 Vantage": //model id = 20
+                populateList("10/20/");
+                break;
+            default:
+        }
+
+
+        // Bentley Cases, make id = 11
+        if ("Continental".equals(item)) { // model id = 22
+            populateList("11/22/");
+        }
+
+        // BMW Cases, make id = 9
+        if("M6".equals(item)) { // model id = 19
+            populateList("9/19/");
+        }
+
+        // Bugatti Cases, make id = 7       //TODO: case does not work
+        if("Chiron".equals(item)) { // model id = 12
+            populateList("7/12/");
+        }
+
+        // Maserati Cases, make id = 8
+        switch (item) {
+            case "GranTurismo": // model id = 13
+                populateList("8/13/");
+                break;
+            case "Levante": //model id = 14
+                populateList("8/14/");
+                break;
+            case "spyder": //model id = 15          //TODO: case does not work
+                populateList("8/15/");
+                break;
+            default:
+        }
+
+
+        // Ferrari Cases, make id = 5
+        switch (item) {
+            case "360": // model id = 4
+                populateList("5/4/");
+                break;
+            case "F430": //model id = 5
+                populateList("5/5/");
+                break;
+            default:
+        }
+
+
+        // Jaguar Cases, make id = 2
+        if("XJ".equals(item)) { // model id = 2
+            populateList("2/2/");
+        }
+
+
+        // Porsche Cases, make id = 6
+        switch (item) {
+            case "911": // model id = 9             //TODO: case does not work
+                populateList("6/9/");
+                break;
+            case "Boxter": //model id = 10
+                populateList("6/10/");
+                break;
+            case "Cayman": //model id = 11
+                populateList("6/11/");
+                break;
+            default:
+        }
 
         /*
         System.out.println(carMakesList.size());
@@ -320,6 +378,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
+    private void populateList(String modelInfo) {
+        //Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+        availableVehicleURLSting.replace(0,availableVehicleURLSting.length(),availableVehicleURL);
+        //lv.clearChoices();
+        vehiclesList.clear();   // clear out old vehicle list data
+        availableVehicleURLSting.append(modelInfo);
+        availableVehicleURLSting.append(zipCode);
+        new GetAvailableVehicles().execute();
+    }
 
 
     @Override

@@ -75,10 +75,19 @@ public class CarDetailsActivity extends AppCompatActivity {
         }
 
         if(model.equals("DB11")) {                      // Aston Martin's
-            setCarImage("tesla_model_s");
+            setCarImage("db11");
         } else if(model.equals("V12 Vantage")) {
-            setCarImage("tesla_model_s");
+            setCarImage("v12vantage");
         }
+
+        if(model.equals("Continental")) {               // Bentley's
+            setCarImage("continental");
+        }
+
+        if(model.equals("M6")) {               // BMW's
+            setCarImage("m6");
+        }
+
 
 
 
