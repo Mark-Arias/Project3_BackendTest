@@ -11,4 +11,10 @@
         <item>Uranus</item>
         <item>Neptune</item>
     </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="testing_out_some_display_stuff">Testing out some display stuff</string>
+    <string name="lime">lime</string>
+    <string name="mango">mango</string>
+    <string name="kiwi">kiwi</string>
 </resources>

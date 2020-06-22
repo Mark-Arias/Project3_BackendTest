@@ -2,14 +2,19 @@ package com.example.project3_backendtest;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -35,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private ListView lv;
     private Spinner spinner;
     private Spinner modelSpinner;
+
+    private CarDetails carDetailFragment;
 
     //----------------------------------------------------------------------------------------------
     // URL's for connection to specified remote servers
@@ -90,15 +97,56 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //new GetModel().execute();
         //new GetAvailableVehicles().execute();
 
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String selectedItem = (String) parent.getItemAtPosition(position).toString();   // this item is the hashmap with the values i need
-                // to create a new fragment populated with all the right info
-                // so fragment creation should happen here
-               System.out.println("User selected: " + selectedItem);
+
+
+        //TODO: This is where i need to put in some work
+        // click listener for the list view, lets me get the selected item and info about that item listed inside the listView
+        // Use the harvest information as done below to populate local variables with the needed info to create a new fragment
+        // position can be used to get info about said ith item in the list. that is also the ith object in the vehicle list array
+        // figure out how to create a new fragment, populate it with this data, and i am on the home stretch!
+        lv.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) -> {
+            String selectedItem = (String) parent.getItemAtPosition(position).toString();   // this item is the hashmap with the values i need
+            // to create a new fragment populated with all the right info
+            // so fragment creation should happen here
+           //System.out.println("User selected: " + selectedItem);
+            System.out.println("harvested info");
+
+            System.out.println(vehiclesList.get(position).get("vin_number"));
+            System.out.println(vehiclesList.get(position).get("veh_description"));
+            System.out.println(vehiclesList.get(position).get("price"));
+            System.out.println(vehiclesList.get(position).get("created_at"));
+            System.out.println(vehiclesList.get(position).get("image_url"));
+            System.out.println(vehiclesList.get(position).get("vehicle_url"));
+
+            /*
+            for(int i = 0; i < vehiclesList.size(); i++ ){
+                System.out.println(vehiclesList.get(i).get("vin_number"));
+                System.out.println(vehiclesList.get(i).get("veh_description"));
+                System.out.println(vehiclesList.get(i).get("price"));
+                System.out.println(vehiclesList.get(i).get("created_at"));
+                System.out.println(vehiclesList.get(i).get("image_url"));
+                System.out.println(vehiclesList.get(i).get("vehicle_url"));
 
             }
+             */
+            // create a new fragment to display car info
+            //carDetailFragment = CarDetails.newInstance("random","text");    // pass in a hashmap object with above info as a paramter to this fragment
+
+            //ConstraintLayout fl = (ConstraintLayout) findViewById(R.id.parent);   // find Gallery fragment
+            //fl.removeAllViews();    // remove views on fragment specified
+            //((ViewGroup)lv.getParent()).removeView(lv);
+            //FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();   // transaction object
+            //transaction.replace(R.id.parentLayout, carDetailFragment);  // swap and replace in second param. into first param
+            //transaction.addToBackStack(null);
+            //transaction.commit();
+
+
+            Intent myIntent = new Intent(MainActivity.this, CarDetailsActivity.class);
+            myIntent.putExtra("data", vehiclesList); //send over the hashmap to the activity
+            String temp = Integer.toString(position);
+            myIntent.putExtra("position",temp); // send the position of the selected item in the list
+            MainActivity.this.startActivity(myIntent);
+
         });
 
     }
