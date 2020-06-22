@@ -17,4 +17,10 @@
     <string name="lime">lime</string>
     <string name="mango">mango</string>
     <string name="kiwi">kiwi</string>
+    <string name="last_update">Last Update:</string>
+    <string name="vin">Vin:</string>
+    <string name="car_description">car description</string>
+    <string name="_0_00">$ 0.00</string>
+    <string name="make_model">Make - Model</string>
+    <string name="image_of_listed_car">image of listed car</string>
 </resources>
