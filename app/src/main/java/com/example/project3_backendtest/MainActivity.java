@@ -320,7 +320,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             case "Levante": //model id = 14
                 populateList("8/14/");
                 break;
-            case "spyder": //model id = 15          //TODO: case does not work
+            case "Syder": //model id = 15          //TODO: case does not work
                 populateList("8/15/");
                 break;
             default:
